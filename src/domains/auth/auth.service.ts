@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { addDays, addSeconds, format } from 'date-fns';
 import { randomBytes } from 'crypto';
+import { compareSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Op } from 'sequelize';
 import { Response } from 'src/models/response.model';
@@ -12,10 +13,13 @@ import { Sequelize } from 'sequelize-typescript';
 import { UserProfiles } from 'src/models/user-profiles.model';
 import {
   EMAIL_ALREADY_EXIST,
+  INVALID_PASSWORD,
   PHONE_NUMBER_ALREADY_EXIST,
   SUCCESS_GENERATE_TOKEN,
+  USER_NOT_FOUND,
 } from './constants/auth.constant';
 import { SignupReqDto } from './dtos/signup-req.dto';
+import { LoginReqDto } from './dtos/login-req.dto';
 
 @Injectable()
 export class AuthService {
@@ -133,6 +137,35 @@ export class AuthService {
       refreshToken,
       userId,
       expiredAt: addDays(new Date(), 7),
+    });
+  }
+
+  async login(loginReqDto: LoginReqDto): Promise<Response> {
+    const { email, password } = loginReqDto;
+
+    const user = await this.userModel.findOne({
+      where: { email },
+      attributes: ['id', 'password'],
+    });
+
+    if (!user) {
+      throw new HttpException(USER_NOT_FOUND, HttpStatus.UNAUTHORIZED);
+    }
+
+    const isMatch = compareSync(password, user.password);
+
+    if (!isMatch) {
+      throw new HttpException(INVALID_PASSWORD, HttpStatus.UNAUTHORIZED);
+    }
+
+    const refreshToken = await this.generateRefreshToken(user.id);
+    const { accessToken, expiresIn } = this.generateAccessToken(user.id);
+
+    return new Response(SUCCESS_GENERATE_TOKEN, HttpStatus.OK, {
+      refreshToken: refreshToken.refreshToken,
+      accessToken,
+      expiresIn,
+      type: 'Bearer',
     });
   }
 }
