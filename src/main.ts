@@ -15,11 +15,10 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   const config = new DocumentBuilder()
-    .setTitle('Courtri Documentations')
-    .setDescription('Courtri API Docs')
+    .setTitle('Appa Documentations')
+    .setDescription('Appa API Docs')
     .setVersion('1.0')
     .addTag('v1')
-    .addServer('https://courtri.com/api')
     .addServer(`http://localhost:${PORT}`)
     .addBearerAuth()
     .build();

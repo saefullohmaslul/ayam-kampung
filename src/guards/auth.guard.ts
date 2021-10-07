@@ -7,8 +7,8 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { readFileSync } from 'fs';
-import { Observable } from 'rxjs';
 import { verify, Algorithm } from 'jsonwebtoken';
+import { Observable } from 'rxjs';
 import { INVALID_TOKEN } from './auth.constant';
 
 @Injectable()
@@ -37,12 +37,10 @@ export class AuthGuard implements CanActivate {
       throw new HttpException(INVALID_TOKEN, HttpStatus.UNAUTHORIZED);
     }
 
-    const user = {
+    data.user = {
       id: decodedToken.userId,
-      roles: decodedToken.roles,
     };
 
-    data.user = user;
     return true;
   }
 }
