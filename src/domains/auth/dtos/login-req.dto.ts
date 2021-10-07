@@ -1,19 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsPhoneNumber, IsString, Length } from 'class-validator';
+import { Length, IsNotEmpty, IsString, IsEmail } from 'class-validator';
 
 export class LoginReqDto {
   @ApiProperty({
-    description: 'phone number with country code',
+    description: 'user email',
     type: String,
-    minLength: 9,
-    maxLength: 15,
-    required: true,
+    format: 'email',
   })
   @IsNotEmpty()
   @IsString()
-  @IsPhoneNumber()
-  @Length(9, 15, {
-    message: 'phone number too long',
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({
+    description: 'user password',
+    type: String,
   })
-  phone: string;
+  @IsNotEmpty()
+  @IsString()
+  @Length(8, 100, {
+    message: 'password must minimal 8 character',
+  })
+  password: string;
 }

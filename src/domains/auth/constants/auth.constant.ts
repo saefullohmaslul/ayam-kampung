@@ -5,3 +5,4 @@ export const ROLE_NOT_FOUND = 'role not found';
 export const SUCCESS_GENERATE_TOKEN = 'success generate token';
 export const EMAIL_ALREADY_EXIST = 'email already exist';
 export const PHONE_NUMBER_ALREADY_EXIST = 'phone number already exist';
+export const INVALID_PASSWORD = 'invalid password';
